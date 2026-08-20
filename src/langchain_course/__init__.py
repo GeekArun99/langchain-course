@@ -3,13 +3,24 @@ from langchain_core.prompts import PromptTemplate
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama
+from langchain.agents import create_agent
+from langchain.tools import tool
+from langchain_core.messages import HumanMessage
+from langchain_community.tools.tavily_search import TavilySearchResults
 
 load_dotenv()
 
-# model = Groq(
-#     id="openai/gpt-oss-120b"
-# )
-
+@tool
+def search(query : str) -> str:
+    """
+    Tool that gives the value for toyo temperature
+    Args:
+        query : The query to search for
+    Return:
+        The search Result
+    """
+    print(f"searching for {query}")
+    return "tokyo weather is sunny"
 
 def main() -> None:
     print("Hello from langchain-course!")
@@ -36,12 +47,18 @@ def main() -> None:
         input_variables=["information"], template=summary_template
     )
 
-    llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0)
+    tools = [search]
+    llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0) #llm + memory = chain
     # llm = ChatOllama(model="gemma3:270m", temperature=0)
+    
+    agent = create_agent(model = llm, tools = tools)
 
-    chain = summary_prompt_template | llm
-    response = chain.invoke({"information": information})
-    print(response.content)
+    result = agent.invoke({"messages" : HumanMessage(content = "What is the weather in Tokyo")})
+    print(result)
+
+    # chain = summary_prompt_template | llm
+    # response = chain.invoke({"information": information})
+    # print(response.content)
 
 
 if __name__ == "__main__":
