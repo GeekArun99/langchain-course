@@ -6,7 +6,7 @@ from langchain_ollama import ChatOllama
 from langchain.agents import create_agent
 from langchain.tools import tool
 from langchain_core.messages import HumanMessage
-from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain_tavily import TavilySearch
 
 load_dotenv()
 
@@ -20,7 +20,7 @@ def search(query : str) -> str:
         The search Result
     """
     print(f"searching for {query}")
-    return "tokyo weather is sunny"
+    return tavily.search(query = query)
 
 def main() -> None:
     print("Hello from langchain-course!")
@@ -47,13 +47,13 @@ def main() -> None:
         input_variables=["information"], template=summary_template
     )
 
-    tools = [search]
+    tools = [TavilySearch()]
     llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0) #llm + memory = chain
     # llm = ChatOllama(model="gemma3:270m", temperature=0)
     
     agent = create_agent(model = llm, tools = tools)
 
-    result = agent.invoke({"messages" : HumanMessage(content = "What is the weather in Tokyo")})
+    result = agent.invoke({"messages" : HumanMessage(content = "What is the rate of being profitable trader, in especially XAU/USD")})
     print(result)
 
     # chain = summary_prompt_template | llm
