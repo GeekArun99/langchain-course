@@ -3,6 +3,7 @@ from langchain_unstructured import UnstructuredLoader
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_pinecone import PineconeVectorStore
+import os
 
 load_dotenv()
 
@@ -39,7 +40,7 @@ if __name__ == "__main__":
     PineconeVectorStore.from_documents(
         chunks,
         embedding=embedding_model,
-        index_name="medium-blogs-embbedings-index"
+        index_name=os.environ["INDEX_NAME"]
     )
 
     print("done")
